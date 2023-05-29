@@ -92,7 +92,7 @@
       if (points >= upgradeClickPowerCost) {
         points -= upgradeClickPowerCost;
         clickPower++;
-        upgradeClickPowerCost *= 2;
+        upgradeClickPowerCost *= .2;
         updatePoints();
         updateUpgradeCosts();
       }
@@ -103,7 +103,7 @@
       if (points >= upgradeIdleProductionCost) {
         points -= upgradeIdleProductionCost;
         idleProduction++;
-        upgradeIdleProductionCost %= 20;
+        upgradeIdleProductionCost *= .2;
         updatePoints();
         updateUpgradeCosts();
       }
