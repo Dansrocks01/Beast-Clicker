@@ -39,15 +39,15 @@
   </style>
 </head>
 <body>
-  <h1>Beast Clicker</h1>
-  <p>Click the Beast to earn points:</p>
+  <h1>Idle Clicker Game</h1>
+  <p>Click the image to earn points:</p>
   <button id="clickButton">
     <img src="https://dl.openseauserdata.com/cache/originImage/files/704454b4ed7ceda66b45445ceac66383.png" alt="Click Me" style="width: 200px; height: auto;" />
   </button>
   <p>Points: <span id="points">0</span></p>
   <h2>Upgrades</h2>
-  <button id="upgradeClickPower">Upgrade Click Power</button>
-  <button id="upgradeIdleProduction">Upgrade Idle Click Production</button>
+  <button id="upgradeClickPower">Upgrade Click Power ($10)</button>
+  <button id="upgradeIdleProduction">Upgrade Idle Click Production ($20)</button>
 
   <script>
     // Game variables
@@ -56,6 +56,7 @@
     let idleProduction = 0;
     let upgradeClickPowerCost = 10;
     let upgradeIdleProductionCost = 20;
+    let intervalId = null;
 
     // Function to update points
     function updatePoints() {
@@ -108,6 +109,12 @@
       }
     }
 
+    // Function to handle idle production
+    function handleIdleProduction() {
+      points += idleProduction;
+      updatePoints();
+    }
+
     // Event listeners
     const clickButton = document.getElementById('clickButton');
     clickButton.addEventListener('click', handleClick);
@@ -118,10 +125,14 @@
     const upgradeIdleProductionButton = document.getElementById('upgradeIdleProduction');
     upgradeIdleProductionButton.addEventListener('click', handleUpgradeIdleProduction);
 
+    // Set up idle production interval
+    intervalId = setInterval(handleIdleProduction, 1000);
+
     // Initial updates
     updatePoints();
     updateUpgradeCosts();
   </script>
 </body>
 </html>
+
 
