@@ -39,8 +39,8 @@
   </style>
 </head>
 <body>
-  <h1>Idle Clicker Game</h1>
-  <p>Click the image to earn points:</p>
+  <h1>Beast Clicker</h1>
+  <p>Click the Beast to earn points:</p>
   <button id="clickButton">
     <img src="https://dl.openseauserdata.com/cache/originImage/files/704454b4ed7ceda66b45445ceac66383.png" alt="Click Me" style="width: 200px; height: auto;" />
   </button>
@@ -76,6 +76,14 @@
     function handleClick() {
       points += clickPower;
       updatePoints();
+
+      const image = document.querySelector("#clickButton img");
+      image.classList.add("clicked");
+
+      // Remove the "clicked" class after the animation completes
+      setTimeout(function() {
+        image.classList.remove("clicked");
+      }, 500);
     }
 
     // Function to handle upgrade click power button click event
@@ -94,30 +102,12 @@
       if (points >= upgradeIdleProductionCost) {
         points -= upgradeIdleProductionCost;
         idleProduction++;
-        upgradeIdleProductionCost %= 10;
+        upgradeIdleProductionCost *= 2;
         updatePoints();
         updateUpgradeCosts();
       }
     }
-    
-    // Function to handle image click event
-    function handleImageClick() {
-      points += clickPower;
-      updatePoints();
 
-      const image = document.querySelector("#clickButton img");
-      image.classList.add("clicked");
-
-      // Remove the "clicked" class after the animation completes
-      setTimeout(function() {
-        image.classList.remove("clicked");
-      }, 500);
-    }
-
-    // Event listener for image click
-    const clickButton = document.getElementById("clickButton");
-    clickButton.addEventListener("click", handleImageClick);
-    
     // Event listeners
     const clickButton = document.getElementById('clickButton');
     clickButton.addEventListener('click', handleClick);
@@ -127,12 +117,11 @@
 
     const upgradeIdleProductionButton = document.getElementById('upgradeIdleProduction');
     upgradeIdleProductionButton.addEventListener('click', handleUpgradeIdleProduction);
-    
-    // Idle production interval
-    setInterval(function() {
-      points += idleProduction;
-      updatePoints();
-    }, 1000); // 1 second
+
+    // Initial updates
+    updatePoints();
+    updateUpgradeCosts();
   </script>
 </body>
 </html>
+
