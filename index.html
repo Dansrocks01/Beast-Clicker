@@ -103,7 +103,7 @@
       if (points >= upgradeIdleProductionCost) {
         points -= upgradeIdleProductionCost;
         idleProduction++;
-        upgradeIdleProductionCost *= 2;
+        upgradeIdleProductionCost %= 20;
         updatePoints();
         updateUpgradeCosts();
       }
