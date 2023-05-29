@@ -115,6 +115,44 @@
       points += idleProduction;
       updatePoints();
     }
+    
+    // Function to save game progress
+    function saveProgress() {
+      const gameData = {
+        points: points,
+        clickPower: clickPower,
+        idleProduction: idleProduction,
+        upgradeClickPowerCost: upgradeClickPowerCost,
+        upgradeIdleProductionCost: upgradeIdleProductionCost
+      };
+  localStorage.setItem('gameData', JSON.stringify(gameData));
+}
+
+    // Function to load game progress
+    function loadProgress() {
+      const savedData = localStorage.getItem('gameData');
+      if (savedData) {
+        const gameData = JSON.parse(savedData);
+        points = gameData.points;
+        clickPower = gameData.clickPower;
+        idleProduction = gameData.idleProduction;
+        upgradeClickPowerCost = gameData.upgradeClickPowerCost;
+        upgradeIdleProductionCost = gameData.upgradeIdleProductionCost;
+        updatePoints();
+        updateUpgradeCosts();
+      }
+    }
+
+    // Function to automatically save game progress at regular intervals
+    function startAutoSave() {
+      setInterval(saveProgress, 5000); // Save every 5 seconds (adjust the interval as desired)
+    }
+
+    // Call loadProgress to load the saved progress when the page is loaded
+    loadProgress();
+
+    // Start automatic saving of game progress
+    startAutoSave();
 
     // Event listeners
     const clickButton = document.getElementById('clickButton');
