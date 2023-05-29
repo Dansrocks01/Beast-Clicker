@@ -63,15 +63,16 @@
       const pointsElement = document.getElementById('points');
       pointsElement.textContent = points.toFixed(0); // Set decimal places to 0
     }
-
+    
     // Function to update upgrade costs
     function updateUpgradeCosts() {
       const upgradeClickPowerButton = document.getElementById('upgradeClickPower');
-      upgradeClickPowerButton.textContent = `Upgrade Click Power ($${upgradeClickPowerCost})`;
+      upgradeClickPowerButton.textContent = `Upgrade Click Power ($${upgradeClickPowerCost.toFixed(0)})`;
 
       const upgradeIdleProductionButton = document.getElementById('upgradeIdleProduction');
-      upgradeIdleProductionButton.textContent = `Upgrade Idle Click Production ($${upgradeIdleProductionCost})`;
+      upgradeIdleProductionButton.textContent = `Upgrade Idle Click Production ($${upgradeIdleProductionCost.toFixed(0)})`;
     }
+
 
     // Function to handle click button click event
     function handleClick() {
@@ -94,7 +95,7 @@
         clickPower++;
         upgradeClickPowerCost *= 1.2;
         updatePoints();
-        updateUpgradeCosts.toFixed(0);
+        updateUpgradeCosts();
       }
     }
 
@@ -105,7 +106,7 @@
         idleProduction++;
         upgradeIdleProductionCost *= 1.2;
         updatePoints();
-        updateUpgradeCosts.toFixed(0);
+        updateUpgradeCosts();
       }
     }
 
