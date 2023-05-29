@@ -13,10 +13,17 @@
   <p>Click the button to earn points:</p>
   <button id="clickButton">Click Me</button>
   <p>Points: <span id="points">0</span></p>
+  <h2>Upgrades</h2>
+  <button id="upgradeClickPower">Upgrade Click Power</button>
+  <button id="upgradeIdleProduction">Upgrade Idle Click Production</button>
 
   <script>
-    // Set initial points
+    // Game variables
     let points = 0;
+    let clickPower = 1;
+    let idleProduction = 0;
+    let upgradeClickPowerCost = 10;
+    let upgradeIdleProductionCost = 20;
 
     // Function to update points
     function updatePoints() {
@@ -24,13 +31,58 @@
       pointsElement.textContent = points;
     }
 
-    // Event listener for the click button
-    const clickButton = document.getElementById('clickButton');
-    clickButton.addEventListener('click', function() {
-      // Increment points when clicked
-      points++;
+    // Function to update upgrade costs
+    function updateUpgradeCosts() {
+      const upgradeClickPowerButton = document.getElementById('upgradeClickPower');
+      upgradeClickPowerButton.textContent = `Upgrade Click Power ($${upgradeClickPowerCost})`;
+
+      const upgradeIdleProductionButton = document.getElementById('upgradeIdleProduction');
+      upgradeIdleProductionButton.textContent = `Upgrade Idle Click Production ($${upgradeIdleProductionCost})`;
+    }
+
+    // Function to handle click button click event
+    function handleClick() {
+      points += clickPower;
       updatePoints();
-    });
+    }
+
+    // Function to handle upgrade click power button click event
+    function handleUpgradeClickPower() {
+      if (points >= upgradeClickPowerCost) {
+        points -= upgradeClickPowerCost;
+        clickPower++;
+        upgradeClickPowerCost *= 2;
+        updatePoints();
+        updateUpgradeCosts();
+      }
+    }
+
+    // Function to handle upgrade idle production button click event
+    function handleUpgradeIdleProduction() {
+      if (points >= upgradeIdleProductionCost) {
+        points -= upgradeIdleProductionCost;
+        idleProduction++;
+        upgradeIdleProductionCost *= 2;
+        updatePoints();
+        updateUpgradeCosts();
+      }
+    }
+
+    // Event listeners
+    const clickButton = document.getElementById('clickButton');
+    clickButton.addEventListener('click', handleClick);
+
+    const upgradeClickPowerButton = document.getElementById('upgradeClickPower');
+    upgradeClickPowerButton.addEventListener('click', handleUpgradeClickPower);
+
+    const upgradeIdleProductionButton = document.getElementById('upgradeIdleProduction');
+    upgradeIdleProductionButton.addEventListener('click', handleUpgradeIdleProduction);
+    
+    // Idle production interval
+    setInterval(function() {
+      points += idleProduction;
+      updatePoints();
+    }, 1000); // 1 second
   </script>
 </body>
 </html>
