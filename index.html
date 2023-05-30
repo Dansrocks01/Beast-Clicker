@@ -111,8 +111,6 @@
 
       const image = document.querySelector("#clickButton img");
       image.classList.add("clicked");
-
-      // Remove the "clicked" class after the animation completes
       setTimeout(function() {
         image.classList.remove("clicked");
       }, 500);
@@ -163,6 +161,16 @@
       });
     }
 
+    // Function to update points based on idle generation
+    function updatePointsIdle() {
+      let totalProduction = 0;
+      buildings.forEach(function(building) {
+        totalProduction += building.count * building.production;
+      });
+      points += totalProduction;
+      updatePoints();
+    }
+
     // Initialize buildings
     const buildingNames = [
       "Beast Street", "Bullhattan District", "Champions Court", "Cloudy Gardens", "Faded Heights",
@@ -171,17 +179,26 @@
       "The Odeon", "Cortado Cafe", "Gaia Grove", "The Beastro"
     ];
 
+    const buildingProduction = [0.1, 1, 8, 47, 260,
+                                1400, 7800, 44000, 260000, 1.6e6,
+                                1e7, 6.2e7, 3.9e8, 2.5e9, 1.7e10,
+                                1.1e11, 7.6e11, 5.3e12, 3.7e13, 2.6e14];
+
     for (let i = 0; i < buildingNames.length; i++) {
       buildings.push({
         name: buildingNames[i],
         count: 0,
-        cost: Math.pow(10, i + 1)
+        cost: Math.pow(10, i + 1),
+        production: buildingProduction[i]
       });
     }
 
     // Event listeners
     const clickButton = document.getElementById('clickButton');
     clickButton.addEventListener('click', handleClick);
+
+    // Idle point generation
+    setInterval(updatePointsIdle, 1000);
 
     // Initial updates
     updatePoints();
