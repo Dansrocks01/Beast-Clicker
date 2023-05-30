@@ -54,7 +54,7 @@
   <button id="upgradeIdleProduction">Upgrade Idle Click Production ($20)</button>
 
   <script>
-    // Game variables
+   // Game variables
     let points = 0;
     let clickPower = 1;
     let idleProduction = 0;
@@ -66,30 +66,6 @@
     function updatePoints() {
       const pointsElement = document.getElementById('points');
       pointsElement.textContent = points.toFixed(0); // Set decimal places to 0
-    }
-    
-    // Function to update upgrade costs
-    function updateUpgradeCosts() {
-      const upgradeClickPowerButton = document.getElementById('upgradeClickPower');
-      upgradeClickPowerButton.textContent = `Upgrade Click Power ($${upgradeClickPowerCost.toFixed(0)})`;
-
-      const upgradeIdleProductionButton = document.getElementById('upgradeIdleProduction');
-      upgradeIdleProductionButton.textContent = `Upgrade Idle Click Production ($${upgradeIdleProductionCost.toFixed(0)})`;
-    }
-
-
-    // Function to handle click button click event
-    function handleClick() {
-      points += clickPower;
-      updatePoints();
-
-      const image = document.querySelector("#clickButton img");
-      image.classList.add("clicked");
-
-      // Remove the "clicked" class after the animation completes
-      setTimeout(function() {
-        image.classList.remove("clicked");
-      }, 500);
     }
 
     // Function to handle upgrade click power button click event
@@ -119,88 +95,29 @@
       points += idleProduction;
       updatePoints();
     }
-    
-    // Define idle click production upgrades
-    const idleClickProductionUpgrades = [
-      {
-        name: 'Upgrade 1',
-        baseCost: 10,
-        baseEffect: 0.1,
-        costMultiplier: 1.2,
-        effectMultiplier: 1.5,
-        quantity: 0,
-        totalEffect: function() {
-          return this.baseEffect * Math.pow(this.effectMultiplier, this.quantity);
-        },
-        totalCost: function() {
-          return this.baseCost * Math.pow(this.costMultiplier, this.quantity);
-        }
-      },
-      {
-        name: 'Upgrade 2',
-        baseCost: 50,
-        baseEffect: 0.5,
-        costMultiplier: 1.2,
-        effectMultiplier: 1.5,
-        quantity: 0,
-        totalEffect: function() {
-          return this.baseEffect * Math.pow(this.effectMultiplier, this.quantity);
-        },
-        totalCost: function() {
-          return this.baseCost * Math.pow(this.costMultiplier, this.quantity);
-        }
-      },
-      // Add more idle click production upgrades
-    ];
 
-    // Function to update the display of idle click production upgrades
-    function updateIdleClickProductionUpgrades() {
-      const upgradesContainer = document.getElementById('idleClickProductionUpgrades');
-      upgradesContainer.innerHTML = '';
+    // Function to update upgrade costs
+    function updateUpgradeCosts() {
+      const upgradeClickPowerButton = document.getElementById('upgradeClickPower');
+      upgradeClickPowerButton.textContent = `Upgrade Click Power ($${upgradeClickPowerCost.toFixed(0)})`;
 
-      idleClickProductionUpgrades.forEach(function(upgrade) {
-        const upgradeButton = document.createElement('button');
-        upgradeButton.textContent = `${upgrade.name} ($${upgrade.totalCost().toFixed(0)}) - +${upgrade.totalEffect().toFixed(2)} points/s`;
-        upgradeButton.addEventListener('click', function() {
-          if (points >= upgrade.totalCost()) {
-            points -= upgrade.totalCost();
-            upgrade.quantity++;
-            updateIdleClickProductionUpgrades();
-            updatePoints();
-          }
-        });
-
-        upgradesContainer.appendChild(upgradeButton);
-      });
-    }
-    
-    // Remove the idlePoints variable declaration
-    let points = 0;
-
-    // Function to update the points based on the total effect of all idle click production upgrades
-    function updatePoints() {
-      // Update the points display
-      const pointsDisplay = document.getElementById('points');
-      pointsDisplay.textContent = points.toFixed(0);
+      const upgradeIdleProductionButton = document.getElementById('upgradeIdleProduction');
+      upgradeIdleProductionButton.textContent = `Upgrade Idle Click Production ($${upgradeIdleProductionCost.toFixed(0)})`;
     }
 
-    // Function to update the idle points based on the total effect of all idle click production upgrades
-    function updateIdlePoints() {
-      let totalEffect = 0;
-      idleClickProductionUpgrades.forEach(function(upgrade) {
-        totalEffect += upgrade.totalEffect();
-      });
-      Points += totalEffect;
-      updatePoints();
-    }
+    // Event listeners
+    const upgradeClickPowerButton = document.getElementById('upgradeClickPower');
+    upgradeClickPowerButton.addEventListener('click', handleUpgradeClickPower);
 
-    // Update the idle points every second
-    setInterval(updateIdlePoints, 1000);
+    const upgradeIdleProductionButton = document.getElementById('upgradeIdleProduction');
+    upgradeIdleProductionButton.addEventListener('click', handleUpgradeIdleProduction);
 
-    // Call the function to display the idle click production upgrades
-    window.addEventListener('DOMContentLoaded', function() {
-      updateIdleClickProductionUpgrades();
-    });
+    // Set up idle production interval
+    intervalId = setInterval(handleIdleProduction, 1000);
+
+    // Initial updates
+    updatePoints();
+    updateUpgradeCosts();
 
     
     // Function to save game progress
@@ -214,7 +131,7 @@
       };
   localStorage.setItem('gameData', JSON.stringify(gameData));
 }
-
+    
     // Function to load game progress
     function loadProgress() {
       const savedData = localStorage.getItem('gameData');
@@ -240,23 +157,6 @@
 
     // Start automatic saving of game progress
     startAutoSave();
-
-    // Event listeners
-    const clickButton = document.getElementById('clickButton');
-    clickButton.addEventListener('click', handleClick);
-
-    const upgradeClickPowerButton = document.getElementById('upgradeClickPower');
-    upgradeClickPowerButton.addEventListener('click', handleUpgradeClickPower);
-
-    const upgradeIdleProductionButton = document.getElementById('upgradeIdleProduction');
-    upgradeIdleProductionButton.addEventListener('click', handleUpgradeIdleProduction);
-
-    // Set up idle production interval
-    intervalId = setInterval(handleIdleProduction, 1000);
-
-    // Initial updates
-    updatePoints();
-    updateUpgradeCosts();
   </script>
 </body>
 </html>
