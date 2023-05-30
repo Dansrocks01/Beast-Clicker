@@ -116,6 +116,77 @@
       updatePoints();
     }
     
+    // Define idle click production upgrades
+    const idleClickProductionUpgrades = [
+      {
+        name: 'Upgrade 1',
+        baseCost: 10,
+        baseEffect: 0.1,
+        costMultiplier: 1.2,
+        effectMultiplier: 1.5,
+        quantity: 0,
+        totalEffect: function() {
+          return this.baseEffect * Math.pow(this.effectMultiplier, this.quantity);
+        },
+        totalCost: function() {
+          return this.baseCost * Math.pow(this.costMultiplier, this.quantity);
+        }
+      },
+      {
+        name: 'Upgrade 2',
+        baseCost: 50,
+        baseEffect: 0.5,
+        costMultiplier: 1.2,
+        effectMultiplier: 1.5,
+        quantity: 0,
+        totalEffect: function() {
+          return this.baseEffect * Math.pow(this.effectMultiplier, this.quantity);
+        },
+        totalCost: function() {
+          return this.baseCost * Math.pow(this.costMultiplier, this.quantity);
+        }
+      },
+      // Add more idle click production upgrades
+    ];
+
+    // Function to update the display of idle click production upgrades
+    function updateIdleClickProductionUpgrades() {
+      const upgradesContainer = document.getElementById('idleClickProductionUpgrades');
+      upgradesContainer.innerHTML = '';
+
+      idleClickProductionUpgrades.forEach(function(upgrade) {
+        const upgradeButton = document.createElement('button');
+        upgradeButton.textContent = `${upgrade.name} ($${upgrade.totalCost().toFixed(0)}) - +${upgrade.totalEffect().toFixed(2)} points/s`;
+        upgradeButton.addEventListener('click', function() {
+          if (points >= upgrade.totalCost()) {
+            points -= upgrade.totalCost();
+            upgrade.quantity++;
+            updateIdleClickProductionUpgrades();
+            updatePoints();
+          }
+        });
+
+        upgradesContainer.appendChild(upgradeButton);
+      });
+    }
+
+    // Function to update the idle points based on the total effect of all idle click production upgrades
+    function updateIdlePoints() {
+      let totalEffect = 0;
+      idleClickProductionUpgrades.forEach(function(upgrade) {
+        totalEffect += upgrade.totalEffect();
+      });
+      idlePoints += totalEffect;
+      updatePoints();
+    }
+
+    // Update the idle points every second
+    setInterval(updateIdlePoints, 1000);
+
+    // Call the function to display the idle click production upgrades
+    updateIdleClickProductionUpgrades();
+
+    
     // Function to save game progress
     function saveProgress() {
       const gameData = {
