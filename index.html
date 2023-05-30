@@ -6,11 +6,8 @@
   <style>
     body {
       text-align: center;
-      background-image: url(https://ak.picdn.net/shutterstock/videos/8889811/thumb/10.jpg?ip=x480); /* Replace with the actual URL of the park background image */
+      background-image: url('park_background.jpg');
       background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      background-attachment: fixed;
     }
     #clickButton {
       display: inline-block;
@@ -22,7 +19,7 @@
     }
     #clickButton img {
       width: 200px;
-      height: 200px;
+      height: auto;
       transition: transform 0.3s ease;
     }
     #clickButton img:hover {
@@ -43,42 +40,29 @@
       animation: clickAnimation 0.5s;
     }
     .building {
-      display: inline-block;
+      margin-bottom: 10px;
+    }
+    #buildingsContainer {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+    }
+    .buildingInfo {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       width: 200px;
-      height: 200px;
-      margin: 10px;
-      padding: 10px;
-      background-color: rgba(255, 255, 255, 0.7);
-      text-align: center;
+      padding: 5px;
+      background-color: rgba(255, 255, 255, 0.8);
       border-radius: 5px;
     }
-    .building h3 {
-      font-size: 18px;
-      margin: 5px 0;
-    }
-    .building p {
-      font-size: 14px;
-      margin: 5px 0;
-    }
-    .building .cost {
+    .buildingInfo span {
       font-weight: bold;
     }
-    .building .count {
+    #beastPointsPerSecond {
+      margin-top: 20px;
       font-weight: bold;
-      font-size: 16px;
-    }
-    .buy-button {
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      padding: 5px 10px;
-      text-align: center;
-      text-decoration: none;
-      display: inline-block;
-      font-size: 14px;
-      margin-top: 10px;
-      cursor: pointer;
-      border-radius: 3px;
     }
   </style>
 </head>
@@ -88,42 +72,53 @@
   <button id="clickButton">
     <img src="https://dl.openseauserdata.com/cache/originImage/files/704454b4ed7ceda66b45445ceac66383.png" alt="Click Me" style="width: 200px; height: auto;" />
   </button>
-  <p>Beast Points: <span id="points">0</span></p>
+  <p>Beast Points: <span id="beastPoints">0</span></p>
+  <p id="beastPointsPerSecond">Beast Points per second: 0</p>
   <h2>Buildings</h2>
   <div id="buildingsContainer"></div>
   
   <script>
     // Game variables
-    let points = 0;
+    let beastPoints = 0;
     let clickPower = 1;
+    let beastPointsPerSecond = 0;
     let buildings = [];
 
-    // Function to update points
-    function updatePoints() {
-      const pointsElement = document.getElementById('points');
-      pointsElement.textContent = points.toFixed(0);
+    // Function to update beast points
+    function updateBeastPoints() {
+      const beastPointsElement = document.getElementById('beastPoints');
+      beastPointsElement.textContent = beastPoints;
+    }
+
+    // Function to update beast points per second
+    function updateBeastPointsPerSecond() {
+      const beastPointsPerSecondElement = document.getElementById('beastPointsPerSecond');
+      beastPointsPerSecondElement.textContent = `Beast Points per second: ${beastPointsPerSecond.toFixed(2)}`;
     }
 
     // Function to handle click button click event
     function handleClick() {
-      points += clickPower;
-      updatePoints();
+      beastPoints += clickPower;
+      updateBeastPoints();
 
       const image = document.querySelector("#clickButton img");
       image.classList.add("clicked");
+
+      // Remove the "clicked" class after the animation completes
       setTimeout(function() {
         image.classList.remove("clicked");
       }, 500);
     }
 
     // Function to handle building purchase
-    function handleBuildingPurchase(index) {
-      const building = buildings[index];
-      if (points >= building.cost) {
-        points -= building.cost;
+    function handleBuildingPurchase(building) {
+      if (beastPoints >= building.cost) {
+        beastPoints -= building.cost;
         building.count++;
         building.cost *= 1.15;
-        updatePoints();
+        beastPointsPerSecond += building.production;
+        updateBeastPoints();
+        updateBeastPointsPerSecond();
         updateBuildings();
       }
     }
@@ -133,76 +128,94 @@
       const buildingsContainer = document.getElementById('buildingsContainer');
       buildingsContainer.innerHTML = '';
 
-      buildings.forEach(function(building, index) {
-        const buildingElement = document.createElement('div');
-        buildingElement.classList.add('building');
-
-        const buildingNameElement = document.createElement('h3');
-        buildingNameElement.textContent = building.name;
-        buildingElement.appendChild(buildingNameElement);
-
-        const buildingCountElement = document.createElement('p');
-        buildingCountElement.innerHTML = `Owned: <span class="count">${building.count}</span>`;
-        buildingElement.appendChild(buildingCountElement);
-
-        const buildingCostElement = document.createElement('p');
-        buildingCostElement.innerHTML = `Cost: <span class="cost">${building.cost.toFixed(0)}</span> Beast Points`;
-        buildingElement.appendChild(buildingCostElement);
-
-        const buyButton = document.createElement('button');
-        buyButton.classList.add('buy-button');
-        buyButton.textContent = 'Buy';
-        buyButton.addEventListener('click', function() {
-          handleBuildingPurchase(index);
-        });
-        buildingElement.appendChild(buyButton);
-
-        buildingsContainer.appendChild(buildingElement);
-      });
-    }
-
-    // Function to update points based on idle generation
-    function updatePointsIdle() {
-      let totalProduction = 0;
       buildings.forEach(function(building) {
-        totalProduction += building.count * building.production;
+        const buildingDiv = document.createElement('div');
+        buildingDiv.className = 'building';
+
+        const buildingInfo = document.createElement('div');
+        buildingInfo.className = 'buildingInfo';
+
+        const buildingName = document.createElement('span');
+        buildingName.textContent = building.name;
+
+        const buildingOwned = document.createElement('span');
+        buildingOwned.textContent = `Owned: ${building.count}`;
+
+        const buildingCost = document.createElement('span');
+        buildingCost.textContent = `Cost: ${building.cost.toFixed(0)}`;
+
+        const buildingProduction = document.createElement('span');
+        buildingProduction.textContent = `Production: ${building.production.toFixed(2)} BPS`;
+
+        const buildingButton = document.createElement('button');
+        buildingButton.textContent = `Buy (${building.cost.toFixed(0)})`;
+        buildingButton.addEventListener('click', function() {
+          handleBuildingPurchase(building);
+        });
+
+        buildingInfo.appendChild(buildingName);
+        buildingInfo.appendChild(buildingOwned);
+        buildingInfo.appendChild(buildingCost);
+        buildingInfo.appendChild(buildingProduction);
+
+        buildingDiv.appendChild(buildingInfo);
+        buildingDiv.appendChild(buildingButton);
+
+        buildingsContainer.appendChild(buildingDiv);
       });
-      points += totalProduction;
-      updatePoints();
     }
 
-    // Initialize buildings
-    const buildingNames = [
-      "Beast Street", "Bullhattan District", "Champions Court", "Cloudy Gardens", "Faded Heights",
-      "Fort Flex", "MoBA (Museum of Beast Arts)", "Nowhere Parks", "Silicon Alley", "Studio 66",
-      "The Meadows", "Trusty Lake Estates", "Wagmi Way", "Concrete Jungle", "L33T Labs", "Ramone Alley",
-      "The Odeon", "Cortado Cafe", "Gaia Grove", "The Beastro"
-    ];
-
-    const buildingProduction = [0.1, 1, 8, 47, 260,
-                                1400, 7800, 44000, 260000, 1.6e6,
-                                1e7, 6.2e7, 3.9e8, 2.5e9, 1.7e10,
-                                1.1e11, 7.6e11, 5.3e12, 3.7e13, 2.6e14];
-
-    for (let i = 0; i < buildingNames.length; i++) {
-      buildings.push({
-        name: buildingNames[i],
-        count: 0,
-        cost: Math.pow(10, i + 1),
-        production: buildingProduction[i]
-      });
+    // Function to handle upgrade clicking accessories
+    function handleUpgradeClickingAccessories() {
+      // Implement your logic for upgrading clicking accessories here
     }
+
+    // Function to save game progress
+    function saveProgress() {
+      const gameData = {
+        beastPoints: beastPoints,
+        clickPower: clickPower,
+        beastPointsPerSecond: beastPointsPerSecond,
+        buildings: buildings
+      };
+      localStorage.setItem('gameData', JSON.stringify(gameData));
+    }
+
+    // Function to load game progress
+    function loadProgress() {
+      const savedData = localStorage.getItem('gameData');
+      if (savedData) {
+        const gameData = JSON.parse(savedData);
+        beastPoints = gameData.beastPoints;
+        clickPower = gameData.clickPower;
+        beastPointsPerSecond = gameData.beastPointsPerSecond;
+        buildings = gameData.buildings;
+        updateBeastPoints();
+        updateBeastPointsPerSecond();
+        updateBuildings();
+      }
+    }
+
+    // Function to automatically save game progress at regular intervals
+    function startAutoSave() {
+      setInterval(saveProgress, 5000); // Save every 5 seconds (adjust the interval as desired)
+    }
+
+    // Call loadProgress to load the saved progress when the page is loaded
+    loadProgress();
+
+    // Start automatic saving of game progress
+    startAutoSave();
 
     // Event listeners
     const clickButton = document.getElementById('clickButton');
     clickButton.addEventListener('click', handleClick);
 
-    // Idle point generation
-    setInterval(updatePointsIdle, 1000);
-
     // Initial updates
-    updatePoints();
+    updateBeastPoints();
+    updateBeastPointsPerSecond();
     updateBuildings();
   </script>
 </body>
 </html>
+
