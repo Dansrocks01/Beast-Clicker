@@ -2,12 +2,15 @@
 <html>
 <head>
   <title>Beast Clicker</title>
+  <link rel="stylesheet" type="text/css" href="styles.css">
   <style>
     body {
       text-align: center;
-      background-image: url(https://ak.picdn.net/shutterstock/videos/8889811/thumb/10.jpg?ip=x480); /* Replace with the URL of your desired background image */
+      background-image: url(https://ak.picdn.net/shutterstock/videos/8889811/thumb/10.jpg?ip=x480); /* Replace with the actual URL of the park background image */
       background-size: cover;
+      background-position: center;
       background-repeat: no-repeat;
+      background-attachment: fixed;
     }
     #clickButton {
       display: inline-block;
@@ -25,38 +28,57 @@
     #clickButton img:hover {
       transform: scale(1.2);
     }
-    h1 {
-      color: white;
+    @keyframes clickAnimation {
+      0% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(0.8);
+      }
+      100% {
+        transform: scale(1);
+      }
     }
-    p {
-      color: white;
+    .clicked {
+      animation: clickAnimation 0.5s;
     }
     .building {
       display: inline-block;
       width: 200px;
-      height: 80px;
+      height: 200px;
       margin: 10px;
       padding: 10px;
-      background-color: rgba(255, 255, 255, 0.8);
-      border-radius: 10px;
+      background-color: rgba(255, 255, 255, 0.7);
+      text-align: center;
+      border-radius: 5px;
     }
     .building h3 {
-      margin: 0;
-    }
-    .building p {
+      font-size: 18px;
       margin: 5px 0;
     }
-    .upgrade-button {
-      margin: 10px;
-      padding: 5px 10px;
-      background-color: #ffa500;
+    .building p {
+      font-size: 14px;
+      margin: 5px 0;
+    }
+    .building .cost {
+      font-weight: bold;
+    }
+    .building .count {
+      font-weight: bold;
+      font-size: 16px;
+    }
+    .buy-button {
+      background-color: #4CAF50;
       color: white;
       border: none;
-      border-radius: 5px;
+      padding: 5px 10px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 14px;
+      margin-top: 10px;
       cursor: pointer;
-    }
-    .upgrade-button:hover {
-      background-color: #ff8c00;
+      border-radius: 3px;
     }
   </style>
 </head>
@@ -67,163 +89,103 @@
     <img src="https://dl.openseauserdata.com/cache/originImage/files/704454b4ed7ceda66b45445ceac66383.png" alt="Click Me" style="width: 200px; height: auto;" />
   </button>
   <p>Beast Points: <span id="points">0</span></p>
-  
-  <h2>Idle Clicker Production Buildings</h2>
+  <h2>Buildings</h2>
   <div id="buildingsContainer"></div>
   
-  <h2>Upgrade</h2>
-  <button id="upgradeClickingAccessories" class="upgrade-button">Upgrade Clicking Accessories</button>
-
   <script>
     // Game variables
     let points = 0;
     let clickPower = 1;
     let buildings = [];
-    let upgradeClickingAccessoriesCost = 10;
 
     // Function to update points
     function updatePoints() {
       const pointsElement = document.getElementById('points');
-      pointsElement.textContent = points.toFixed(0); // Set decimal places to 0
+      pointsElement.textContent = points.toFixed(0);
     }
 
     // Function to handle click button click event
     function handleClick() {
       points += clickPower;
       updatePoints();
+
+      const image = document.querySelector("#clickButton img");
+      image.classList.add("clicked");
+
+      // Remove the "clicked" class after the animation completes
+      setTimeout(function() {
+        image.classList.remove("clicked");
+      }, 500);
     }
 
-    // Function to handle upgrade clicking accessories button click event
-    function handleUpgradeClickingAccessories() {
-      if (points >= upgradeClickingAccessoriesCost) {
-        points -= upgradeClickingAccessoriesCost;
-        clickPower++;
-        upgradeClickingAccessoriesCost *= 1.2;
+    // Function to handle building purchase
+    function handleBuildingPurchase(index) {
+      const building = buildings[index];
+      if (points >= building.cost) {
+        points -= building.cost;
+        building.count++;
+        building.cost *= 1.15;
         updatePoints();
-        updateUpgradeCosts();
+        updateBuildings();
       }
     }
 
-    // Function to update upgrade costs
-    function updateUpgradeCosts() {
-      const upgradeClickingAccessoriesButton = document.getElementById('upgradeClickingAccessories');
-      upgradeClickingAccessoriesButton.textContent = `Upgrade Clicking Accessories ($${upgradeClickingAccessoriesCost.toFixed(0)})`;
-    }
+    // Function to update the display of buildings
+    function updateBuildings() {
+      const buildingsContainer = document.getElementById('buildingsContainer');
+      buildingsContainer.innerHTML = '';
 
-    // Function to handle idle production
-    function handleIdleProduction() {
-      buildings.forEach(function(building) {
-        points += building.production;
+      buildings.forEach(function(building, index) {
+        const buildingElement = document.createElement('div');
+        buildingElement.classList.add('building');
+
+        const buildingNameElement = document.createElement('h3');
+        buildingNameElement.textContent = building.name;
+        buildingElement.appendChild(buildingNameElement);
+
+        const buildingCountElement = document.createElement('p');
+        buildingCountElement.textContent = `Owned: <span class="count">${building.count}</span>`;
+        buildingElement.appendChild(buildingCountElement);
+
+        const buildingCostElement = document.createElement('p');
+        buildingCostElement.textContent = `Cost: <span class="cost">${building.cost.toFixed(0)}</span> Beast Points`;
+        buildingElement.appendChild(buildingCostElement);
+
+        const buyButton = document.createElement('button');
+        buyButton.classList.add('buy-button');
+        buyButton.textContent = 'Buy';
+        buyButton.addEventListener('click', function() {
+          handleBuildingPurchase(index);
+        });
+        buildingElement.appendChild(buyButton);
+
+        buildingsContainer.appendChild(buildingElement);
       });
-      updatePoints();
     }
 
-    // Function to save game progress
-    function saveProgress() {
-      const gameData = {
-        points: points,
-        clickPower: clickPower,
-        buildings: buildings,
-        upgradeClickingAccessoriesCost: upgradeClickingAccessoriesCost
-      };
-      localStorage.setItem('beastClickerGameData', JSON.stringify(gameData));
+    // Initialize buildings
+    const buildingNames = [
+      "Beast Street", "Bullhattan District", "Champions Court", "Cloudy Gardens", "Faded Heights",
+      "Fort Flex", "MoBA (Museum of Beast Arts)", "Nowhere Parks", "Silicon Alley", "Studio 66",
+      "The Meadows", "Trusty Lake Estates", "Wagmi Way", "Concrete Jungle", "L33T Labs", "Ramone Alley",
+      "The Odeon", "Cortado Cafe", "Gaia Grove", "The Beastro"
+    ];
+
+    for (let i = 0; i < buildingNames.length; i++) {
+      buildings.push({
+        name: buildingNames[i],
+        count: 0,
+        cost: Math.pow(10, i + 1)
+      });
     }
-
-    // Function to load game progress
-    function loadProgress() {
-      const savedData = localStorage.getItem('beastClickerGameData');
-      if (savedData) {
-        const gameData = JSON.parse(savedData);
-        points = gameData.points;
-        clickPower = gameData.clickPower;
-        buildings = gameData.buildings;
-        upgradeClickingAccessoriesCost = gameData.upgradeClickingAccessoriesCost;
-        updatePoints();
-        updateUpgradeCosts();
-      }
-    }
-
-    // Function to automatically save game progress at regular intervals
-    function startAutoSave() {
-      setInterval(saveProgress, 5000); // Save every 5 seconds (adjust the interval as desired)
-    }
-
-    // Call loadProgress to load the saved progress when the page is loaded
-    loadProgress();
-
-    // Start automatic saving of game progress
-    startAutoSave();
 
     // Event listeners
     const clickButton = document.getElementById('clickButton');
     clickButton.addEventListener('click', handleClick);
 
-    const upgradeClickingAccessoriesButton = document.getElementById('upgradeClickingAccessories');
-    upgradeClickingAccessoriesButton.addEventListener('click', handleUpgradeClickingAccessories);
-
-    // Set up idle production interval
-    setInterval(handleIdleProduction, 1000);
-
-    // Define idle clicker production buildings
-    const buildingData = [
-      { name: 'Beast Street', baseCost: 15, baseProduction: 0.1, costMultiplier: 1.15, productionMultiplier: 1.1 },
-      { name: 'Bullhattan District', baseCost: 100, baseProduction: 1, costMultiplier: 1.15, productionMultiplier: 1.1 },
-      { name: 'Champions Court', baseCost: 500, baseProduction: 5, costMultiplier: 1.15, productionMultiplier: 1.1 },
-      { name: 'Cloudy Gardens', baseCost: 3000, baseProduction: 20, costMultiplier: 1.15, productionMultiplier: 1.1 },
-      { name: 'Faded Heights', baseCost: 10000, baseProduction: 100, costMultiplier: 1.15, productionMultiplier: 1.1 },
-      { name: 'Fort Flex', baseCost: 40000, baseProduction: 400, costMultiplier: 1.15, productionMultiplier: 1.1 },
-      { name: 'MoBA (Museum of Beast Arts)', baseCost: 200000, baseProduction: 2000, costMultiplier: 1.15, productionMultiplier: 1.1 },
-      { name: 'Nowhere Parks', baseCost: 1666666, baseProduction: 6666, costMultiplier: 1.15, productionMultiplier: 1.1 },
-      { name: 'Silicon Alley', baseCost: 123456789, baseProduction: 98765, costMultiplier: 1.15, productionMultiplier: 1.1 },
-      { name: 'Studio 66', baseCost: 7777777777, baseProduction: 777777, costMultiplier: 1.15, productionMultiplier: 1.1 },
-      { name: 'The Meadows', baseCost: 100000000000, baseProduction: 10000000, costMultiplier: 1.15, productionMultiplier: 1.1 },
-      { name: 'Trusty Lake Estates', baseCost: 9999999999999, baseProduction: 99999999, costMultiplier: 1.15, productionMultiplier: 1.1 },
-      { name: 'Wagmi Way', baseCost: 55555555555555, baseProduction: 555555555, costMultiplier: 1.15, productionMultiplier: 1.1 },
-      { name: 'Concrete Jungle', baseCost: 444444444444444, baseProduction: 4444444444, costMultiplier: 1.15, productionMultiplier: 1.1 },
-      { name: 'L33T Labs', baseCost: 9999999999999999, baseProduction: 99999999999, costMultiplier: 1.15, productionMultiplier: 1.1 },
-      { name: 'Ramone Alley', baseCost: 999999999999999999, baseProduction: 999999999999, costMultiplier: 1.15, productionMultiplier: 1.1 },
-      { name: 'The Odeon', baseCost: 9999999999999999999, baseProduction: 9999999999999, costMultiplier: 1.15, productionMultiplier: 1.1 },
-      { name: 'Cortado Cafe', baseCost: 77777777777777777777, baseProduction: 77777777777777, costMultiplier: 1.15, productionMultiplier: 1.1 },
-      { name: 'Gaia Grove', baseCost: 666666666666666666666, baseProduction: 6666666666666, costMultiplier: 1.15, productionMultiplier: 1.1 },
-      { name: 'The Beastro', baseCost: 5555555555555555555555, baseProduction: 55555555555555, costMultiplier: 1.15, productionMultiplier: 1.1 }
-    ];
-
-    // Create idle clicker production buildings
-    const buildingsContainer = document.getElementById('buildingsContainer');
-    buildingData.forEach(function(building) {
-      const buildingElement = document.createElement('div');
-      buildingElement.className = 'building';
-      buildingElement.innerHTML = `
-        <h3>${building.name}</h3>
-        <p>Cost: <span class="cost">${building.baseCost.toFixed(0)}</span></p>
-        <p>Production: <span class="production">${building.baseProduction.toFixed(0)}</span></p>
-        <button class="buy-button">Buy</button>
-      `;
-      buildingsContainer.appendChild(buildingElement);
-
-      const buyButton = buildingElement.querySelector('.buy-button');
-      const costElement = buildingElement.querySelector('.cost');
-      const productionElement = buildingElement.querySelector('.production');
-
-      buyButton.addEventListener('click', function() {
-        if (points >= building.currentCost) {
-          points -= building.currentCost;
-          building.count++;
-          building.currentCost *= building.costMultiplier;
-          building.production *= building.productionMultiplier;
-          costElement.textContent = building.currentCost.toFixed(0);
-          productionElement.textContent = building.production.toFixed(0);
-          updatePoints();
-        }
-      });
-
-      buildings.push({
-        name: building.name,
-        count: 0,
-        currentCost: building.baseCost,
-        production: building.baseProduction
-      });
-    });
+    // Initial updates
+    updatePoints();
+    updateBuildings();
   </script>
 </body>
 </html>
