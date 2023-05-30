@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Idle Clicker Game</title>
-  <link rel="stylesheet" type="text/css" href="styles.css">
+  <title>Beast Clicker</title>
   <style>
     body {
       text-align: center;
+      background-image: url('https://example.com/green-park-background.jpg'); /* Replace with the URL of your desired background image */
+      background-size: cover;
+      background-repeat: no-repeat;
     }
     #clickButton {
       display: inline-block;
@@ -16,51 +18,68 @@
       cursor: pointer;
     }
     #clickButton img {
-      width: 100px;
-      height: auto;
+      width: 200px;
+      height: 200px;
       transition: transform 0.3s ease;
     }
     #clickButton img:hover {
       transform: scale(1.2);
     }
-    @keyframes clickAnimation {
-      0% {
-        transform: scale(1);
-      }
-      50% {
-        transform: scale(0.8);
-      }
-      100% {
-        transform: scale(1);
-      }
+    h1 {
+      color: white;
     }
-    .clicked {
-      animation: clickAnimation 0.5s;
+    p {
+      color: white;
+    }
+    .building {
+      display: inline-block;
+      width: 200px;
+      height: 80px;
+      margin: 10px;
+      padding: 10px;
+      background-color: rgba(255, 255, 255, 0.8);
+      border-radius: 10px;
+    }
+    .building h3 {
+      margin: 0;
+    }
+    .building p {
+      margin: 5px 0;
+    }
+    .upgrade-button {
+      margin: 10px;
+      padding: 5px 10px;
+      background-color: #ffa500;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .upgrade-button:hover {
+      background-color: #ff8c00;
     }
   </style>
 </head>
 <body>
-  <h1>Idle Clicker Game</h1>
-  <p>Click the image to earn points:</p>
+  <h1>Beast Clicker</h1>
+  <p>Click the image to earn Beast Points:</p>
   <button id="clickButton">
     <img src="https://dl.openseauserdata.com/cache/originImage/files/704454b4ed7ceda66b45445ceac66383.png" alt="Click Me" style="width: 200px; height: auto;" />
   </button>
-  <p>Points: <span id="points">0</span></p>
-  <h2>Upgrades</h2>
-  <div id="idleClickProductionUpgrades"></div>
+  <p>Beast Points: <span id="points">0</span></p>
   
-  <script src="script.js"></script>
-  <button id="upgradeClickPower">Upgrade Click Power ($10)</button>
-  <button id="upgradeIdleProduction">Upgrade Idle Click Production ($20)</button>
+  <h2>Idle Clicker Production Buildings</h2>
+  <div id="buildingsContainer"></div>
+  
+  <h2>Upgrade</h2>
+  <button id="upgradeClickingAccessories" class="upgrade-button">Upgrade Clicking Accessories</button>
 
   <script>
-   // Game variables
+    // Game variables
     let points = 0;
     let clickPower = 1;
-    let idleProduction = 0;
-    let upgradeClickPowerCost = 10;
-    let upgradeIdleProductionCost = 20;
-    let intervalId = null;
+    let buildings = [];
+    let upgradeClickingAccessoriesCost = 10;
 
     // Function to update points
     function updatePoints() {
@@ -68,79 +87,57 @@
       pointsElement.textContent = points.toFixed(0); // Set decimal places to 0
     }
 
-    // Function to handle upgrade click power button click event
-    function handleUpgradeClickPower() {
-      if (points >= upgradeClickPowerCost) {
-        points -= upgradeClickPowerCost;
-        clickPower++;
-        upgradeClickPowerCost *= 1.2;
-        updatePoints();
-        updateUpgradeCosts();
-      }
-    }
-
-    // Function to handle upgrade idle production button click event
-    function handleUpgradeIdleProduction() {
-      if (points >= upgradeIdleProductionCost) {
-        points -= upgradeIdleProductionCost;
-        idleProduction++;
-        upgradeIdleProductionCost *= 1.2;
-        updatePoints();
-        updateUpgradeCosts();
-      }
-    }
-
-    // Function to handle idle production
-    function handleIdleProduction() {
-      points += idleProduction;
+    // Function to handle click button click event
+    function handleClick() {
+      points += clickPower;
       updatePoints();
+    }
+
+    // Function to handle upgrade clicking accessories button click event
+    function handleUpgradeClickingAccessories() {
+      if (points >= upgradeClickingAccessoriesCost) {
+        points -= upgradeClickingAccessoriesCost;
+        clickPower++;
+        upgradeClickingAccessoriesCost *= 1.2;
+        updatePoints();
+        updateUpgradeCosts();
+      }
     }
 
     // Function to update upgrade costs
     function updateUpgradeCosts() {
-      const upgradeClickPowerButton = document.getElementById('upgradeClickPower');
-      upgradeClickPowerButton.textContent = `Upgrade Click Power ($${upgradeClickPowerCost.toFixed(0)})`;
-
-      const upgradeIdleProductionButton = document.getElementById('upgradeIdleProduction');
-      upgradeIdleProductionButton.textContent = `Upgrade Idle Click Production ($${upgradeIdleProductionCost.toFixed(0)})`;
+      const upgradeClickingAccessoriesButton = document.getElementById('upgradeClickingAccessories');
+      upgradeClickingAccessoriesButton.textContent = `Upgrade Clicking Accessories ($${upgradeClickingAccessoriesCost.toFixed(0)})`;
     }
 
-    // Event listeners
-    const upgradeClickPowerButton = document.getElementById('upgradeClickPower');
-    upgradeClickPowerButton.addEventListener('click', handleUpgradeClickPower);
+    // Function to handle idle production
+    function handleIdleProduction() {
+      buildings.forEach(function(building) {
+        points += building.production;
+      });
+      updatePoints();
+    }
 
-    const upgradeIdleProductionButton = document.getElementById('upgradeIdleProduction');
-    upgradeIdleProductionButton.addEventListener('click', handleUpgradeIdleProduction);
-
-    // Set up idle production interval
-    intervalId = setInterval(handleIdleProduction, 1000);
-
-    // Initial updates
-    updatePoints();
-    updateUpgradeCosts();
-    
     // Function to save game progress
     function saveProgress() {
       const gameData = {
         points: points,
         clickPower: clickPower,
-        idleProduction: idleProduction,
-        upgradeClickPowerCost: upgradeClickPowerCost,
-        upgradeIdleProductionCost: upgradeIdleProductionCost
+        buildings: buildings,
+        upgradeClickingAccessoriesCost: upgradeClickingAccessoriesCost
       };
-  localStorage.setItem('gameData', JSON.stringify(gameData));
-}
-    
+      localStorage.setItem('beastClickerGameData', JSON.stringify(gameData));
+    }
+
     // Function to load game progress
     function loadProgress() {
-      const savedData = localStorage.getItem('gameData');
+      const savedData = localStorage.getItem('beastClickerGameData');
       if (savedData) {
         const gameData = JSON.parse(savedData);
         points = gameData.points;
         clickPower = gameData.clickPower;
-        idleProduction = gameData.idleProduction;
-        upgradeClickPowerCost = gameData.upgradeClickPowerCost;
-        upgradeIdleProductionCost = gameData.upgradeIdleProductionCost;
+        buildings = gameData.buildings;
+        upgradeClickingAccessoriesCost = gameData.upgradeClickingAccessoriesCost;
         updatePoints();
         updateUpgradeCosts();
       }
@@ -156,6 +153,77 @@
 
     // Start automatic saving of game progress
     startAutoSave();
+
+    // Event listeners
+    const clickButton = document.getElementById('clickButton');
+    clickButton.addEventListener('click', handleClick);
+
+    const upgradeClickingAccessoriesButton = document.getElementById('upgradeClickingAccessories');
+    upgradeClickingAccessoriesButton.addEventListener('click', handleUpgradeClickingAccessories);
+
+    // Set up idle production interval
+    setInterval(handleIdleProduction, 1000);
+
+    // Define idle clicker production buildings
+    const buildingData = [
+      { name: 'Beast Street', baseCost: 15, baseProduction: 0.1, costMultiplier: 1.15, productionMultiplier: 1.1 },
+      { name: 'Bullhattan District', baseCost: 100, baseProduction: 1, costMultiplier: 1.15, productionMultiplier: 1.1 },
+      { name: 'Champions Court', baseCost: 500, baseProduction: 5, costMultiplier: 1.15, productionMultiplier: 1.1 },
+      { name: 'Cloudy Gardens', baseCost: 3000, baseProduction: 20, costMultiplier: 1.15, productionMultiplier: 1.1 },
+      { name: 'Faded Heights', baseCost: 10000, baseProduction: 100, costMultiplier: 1.15, productionMultiplier: 1.1 },
+      { name: 'Fort Flex', baseCost: 40000, baseProduction: 400, costMultiplier: 1.15, productionMultiplier: 1.1 },
+      { name: 'MoBA (Museum of Beast Arts)', baseCost: 200000, baseProduction: 2000, costMultiplier: 1.15, productionMultiplier: 1.1 },
+      { name: 'Nowhere Parks', baseCost: 1666666, baseProduction: 6666, costMultiplier: 1.15, productionMultiplier: 1.1 },
+      { name: 'Silicon Alley', baseCost: 123456789, baseProduction: 98765, costMultiplier: 1.15, productionMultiplier: 1.1 },
+      { name: 'Studio 66', baseCost: 7777777777, baseProduction: 777777, costMultiplier: 1.15, productionMultiplier: 1.1 },
+      { name: 'The Meadows', baseCost: 100000000000, baseProduction: 10000000, costMultiplier: 1.15, productionMultiplier: 1.1 },
+      { name: 'Trusty Lake Estates', baseCost: 9999999999999, baseProduction: 99999999, costMultiplier: 1.15, productionMultiplier: 1.1 },
+      { name: 'Wagmi Way', baseCost: 55555555555555, baseProduction: 555555555, costMultiplier: 1.15, productionMultiplier: 1.1 },
+      { name: 'Concrete Jungle', baseCost: 444444444444444, baseProduction: 4444444444, costMultiplier: 1.15, productionMultiplier: 1.1 },
+      { name: 'L33T Labs', baseCost: 9999999999999999, baseProduction: 99999999999, costMultiplier: 1.15, productionMultiplier: 1.1 },
+      { name: 'Ramone Alley', baseCost: 999999999999999999, baseProduction: 999999999999, costMultiplier: 1.15, productionMultiplier: 1.1 },
+      { name: 'The Odeon', baseCost: 9999999999999999999, baseProduction: 9999999999999, costMultiplier: 1.15, productionMultiplier: 1.1 },
+      { name: 'Cortado Cafe', baseCost: 77777777777777777777, baseProduction: 77777777777777, costMultiplier: 1.15, productionMultiplier: 1.1 },
+      { name: 'Gaia Grove', baseCost: 666666666666666666666, baseProduction: 6666666666666, costMultiplier: 1.15, productionMultiplier: 1.1 },
+      { name: 'The Beastro', baseCost: 5555555555555555555555, baseProduction: 55555555555555, costMultiplier: 1.15, productionMultiplier: 1.1 }
+    ];
+
+    // Create idle clicker production buildings
+    const buildingsContainer = document.getElementById('buildingsContainer');
+    buildingData.forEach(function(building) {
+      const buildingElement = document.createElement('div');
+      buildingElement.className = 'building';
+      buildingElement.innerHTML = `
+        <h3>${building.name}</h3>
+        <p>Cost: <span class="cost">${building.baseCost.toFixed(0)}</span></p>
+        <p>Production: <span class="production">${building.baseProduction.toFixed(0)}</span></p>
+        <button class="buy-button">Buy</button>
+      `;
+      buildingsContainer.appendChild(buildingElement);
+
+      const buyButton = buildingElement.querySelector('.buy-button');
+      const costElement = buildingElement.querySelector('.cost');
+      const productionElement = buildingElement.querySelector('.production');
+
+      buyButton.addEventListener('click', function() {
+        if (points >= building.currentCost) {
+          points -= building.currentCost;
+          building.count++;
+          building.currentCost *= building.costMultiplier;
+          building.production *= building.productionMultiplier;
+          costElement.textContent = building.currentCost.toFixed(0);
+          productionElement.textContent = building.production.toFixed(0);
+          updatePoints();
+        }
+      });
+
+      buildings.push({
+        name: building.name,
+        count: 0,
+        currentCost: building.baseCost,
+        production: building.baseProduction
+      });
+    });
   </script>
 </body>
 </html>
