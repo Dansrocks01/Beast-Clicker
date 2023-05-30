@@ -184,7 +184,9 @@
     setInterval(updateIdlePoints, 1000);
 
     // Call the function to display the idle click production upgrades
-    updateIdleClickProductionUpgrades();
+    window.addEventListener('DOMContentLoaded', function() {
+      updateIdleClickProductionUpgrades();
+    });
 
     
     // Function to save game progress
