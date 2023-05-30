@@ -62,291 +62,181 @@
   <button id="clickButton">
     <img src="https://dl.openseauserdata.com/cache/originImage/files/704454b4ed7ceda66b45445ceac66383.png" alt="Click Me" style="width: 200px; height: auto;" />
   </button>
-  <p>Beast Points: <span id="beastPoints">0</span></p>
-  <p>Beast Points per second: <span id="beastPointsPerSecond">0</span></p>
-  <h2>Buildings</h2>
+  <div id="beastPointsContainer">
+    <span>Beast Points: </span>
+    <span id="beastPoints">0</span>
+  </div>
+  <div id="beastPointsPerSecondContainer">
+    <span>Beast Points per Second: </span>
+    <span id="beastPointsPerSecond">0</span>
+  </div>
   <div id="buildingsContainer"></div>
-  
-  <h2>Upgrades</h2>
   <button id="upgradeClickingAccessories">Upgrade Clicking Accessories</button>
 
-  <script src="script.js"></script>
   <script>
-    // Game variables
     let beastPoints = 0;
     let clickPower = 1;
     let beastPointsPerSecond = 0;
+    let intervalId;
     let buildings = [
-      {
-        name: "Beast Street",
-        cost: 15,
-        production: 0.1,
-        count: 0
-      },
-      {
-        name: "Bullhattan District",
-        cost: 100,
-        production: 0.5,
-        count: 0
-      },
-      {
-        name: "Champions Court",
-        cost: 500,
-        production: 2,
-        count: 0
-      },
-      {
-        name: "Cloudy Gardens",
-        cost: 3000,
-        production: 10,
-        count: 0
-      },
-      {
-        name: "Faded Heights",
-        cost: 10000,
-        production: 40,
-        count: 0
-      },
-      {
-        name: "Fort Flex",
-        cost: 40000,
-        production: 200,
-        count: 0
-      },
-      {
-        name: "MoBA (Museum of Beast Arts)",
-        cost: 200000,
-        production: 1000,
-        count: 0
-      },
-      {
-        name: "Nowhere Parks",
-        cost: 1666666,
-        production: 6666,
-        count: 0
-      },
-      {
-        name: "Silicon Alley",
-        cost: 123456789,
-        production: 98765,
-        count: 0
-      },
-      {
-        name: "Studio 66",
-        cost: 3999999999,
-        production: 987654,
-        count: 0
-      },
-      {
-        name: "The Meadows",
-        cost: 75000000000,
-        production: 5555555,
-        count: 0
-      },
-      {
-        name: "Trusty Lake Estates",
-        cost: 1234567890123,
-        production: 44444444,
-        count: 0
-      },
-      {
-        name: "Wagmi Way",
-        cost: 10000000000000,
-        production: 333333333,
-        count: 0
-      },
-      {
-        name: "Concrete Jungle",
-        cost: 99999999999999,
-        production: 2222222222,
-        count: 0
-      },
-      {
-        name: "L33T Labs",
-        cost: 999999999999999,
-        production: 11111111111,
-        count: 0
-      },
-      {
-        name: "Ramone Alley",
-        cost: 9999999999999999,
-        production: 77777777777,
-        count: 0
-      },
-      {
-        name: "The Odeon",
-        cost: 88888888888888888,
-        production: 666666666666,
-        count: 0
-      },
-      {
-        name: "Cortado Cafe",
-        cost: 777777777777777777,
-        production: 5555555555555,
-        count: 0
-      },
-      {
-        name: "Gaia Grove",
-        cost: 6666666666666666666,
-        production: 44444444444444,
-        count: 0
-      },
-      {
-        name: "The Beastro",
-        cost: 55555555555555555555,
-        production: 333333333333333,
-        count: 0
-      }
+      { name: "Beat Street", cost: 10, production: 0.1, count: 0 },
+      { name: "Bullhattan District", cost: 50, production: 0.5, count: 0 },
+      { name: "Champions Court", cost: 100, production: 1, count: 0 },
+      { name: "Cloudy Gardens", cost: 500, production: 5, count: 0 },
+      { name: "Faded Heights", cost: 1000, production: 10, count: 0 },
+      { name: "Fort Flex", cost: 5000, production: 50, count: 0 },
+      { name: "MoBA (Museum of Beast Arts)", cost: 10000, production: 100, count: 0 },
+      { name: "Nowhere Parks", cost: 50000, production: 500, count: 0 },
+      { name: "Silicon Alley", cost: 100000, production: 1000, count: 0 },
+      { name: "Studio 66", cost: 500000, production: 5000, count: 0 },
+      { name: "The Meadows", cost: 1000000, production: 10000, count: 0 },
+      { name: "Trusty Lake Estates", cost: 5000000, production: 50000, count: 0 },
+      { name: "Wagmi Way", cost: 10000000, production: 100000, count: 0 },
+      { name: "Concrete Jungle", cost: 50000000, production: 500000, count: 0 },
+      { name: "L33T Labs", cost: 100000000, production: 1000000, count: 0 },
+      { name: "Ramone Alley", cost: 500000000, production: 5000000, count: 0 },
+      { name: "The Odeon", cost: 1000000000, production: 10000000, count: 0 },
+      { name: "Cortado Cafe", cost: 5000000000, production: 50000000, count: 0 },
+      { name: "Gaia Grove", cost: 10000000000, production: 100000000, count: 0 },
+      { name: "The Beastro", cost: 50000000000, production: 500000000, count: 0 }
     ];
-    let upgradeClickingAccessoriesCost = 50;
-    let intervalId = null;
 
-    // Function to update Beast Points
     function updateBeastPoints() {
-      const beastPointsElement = document.getElementById('beastPoints');
-      beastPointsElement.textContent = beastPoints.toFixed(0);
-    }
-    
-    // Function to update Beast Points per second
-    function updateBeastPointsPerSecond() {
-      const beastPointsPerSecondElement = document.getElementById('beastPointsPerSecond');
-      beastPointsPerSecondElement.textContent = beastPointsPerSecond.toFixed(1);
+      document.getElementById("beastPoints").textContent = beastPoints;
     }
 
-    // Function to handle click button click event
-    function handleClick() {
+    function updateBeastPointsPerSecond() {
+      document.getElementById("beastPointsPerSecond").textContent = beastPointsPerSecond.toFixed(1);
+    }
+
+    function updateBuildingCount(index) {
+      document.getElementById(`buildingCount-${index}`).textContent = buildings[index].count;
+    }
+
+    function updateBuildingCost(index) {
+      document.getElementById(`buildingCost-${index}`).textContent = buildings[index].cost;
+    }
+
+    function updateBuildingProduction(index) {
+      document.getElementById(`buildingProduction-${index}`).textContent = buildings[index].production;
+    }
+
+    function updateAllBuildings() {
+      for (let i = 0; i < buildings.length; i++) {
+        updateBuildingCount(i);
+        updateBuildingCost(i);
+        updateBuildingProduction(i);
+      }
+    }
+
+    function updateClickButton() {
+      document.getElementById("clickButton").textContent = `Click Me! (${clickPower})`;
+    }
+
+    function incrementBeastPoints() {
       beastPoints += clickPower;
       updateBeastPoints();
-
-      const image = document.querySelector("#clickButton img");
-      image.classList.add("clicked");
-
-      // Remove the "clicked" class after the animation completes
-      setTimeout(function() {
-        image.classList.remove("clicked");
-      }, 500);
     }
 
-    // Function to handle building button click event
-    function handleBuildingClick(index) {
+    function incrementBeastPointsPerSecond() {
+      beastPoints += beastPointsPerSecond / 10;
+      updateBeastPoints();
+    }
+
+    function purchaseBuilding(index) {
       if (beastPoints >= buildings[index].cost) {
         beastPoints -= buildings[index].cost;
         buildings[index].count++;
+        beastPointsPerSecond += buildings[index].production;
         updateBeastPoints();
-        updateBuildings();
         updateBeastPointsPerSecond();
+        updateBuildingCount(index);
       }
     }
 
-    // Function to handle upgrade clicking accessories button click event
-    function handleUpgradeClickingAccessoriesClick() {
-      if (beastPoints >= upgradeClickingAccessoriesCost) {
-        beastPoints -= upgradeClickingAccessoriesCost;
-        clickPower *= 2;
-        upgradeClickingAccessoriesCost *= 2;
-        updateBeastPoints();
-        updateUpgradeClickingAccessories();
-      }
+    function createBuildingElement(index) {
+      const building = buildings[index];
+      const buildingElement = document.createElement("div");
+      buildingElement.className = "building";
+      buildingElement.innerHTML = `
+        <span class="buildingName">${building.name}</span>
+        <div>
+          <span class="buildingOwned" id="buildingCount-${index}">${building.count}</span>
+          <span class="buildingLabel">Owned</span>
+        </div>
+        <div>
+          <span class="buildingCost" id="buildingCost-${index}">${building.cost}</span>
+          <span class="buildingLabel">Cost</span>
+        </div>
+        <div>
+          <span class="buildingProduction" id="buildingProduction-${index}">${building.production}</span>
+          <span class="buildingLabel">Production</span>
+        </div>
+        <button class="buildingButton" onclick="purchaseBuilding(${index})">Buy</button>
+      `;
+      return buildingElement;
     }
 
-    // Function to update the buildings information
-    function updateBuildings() {
-      const buildingsContainer = document.getElementById('buildingsContainer');
-      buildingsContainer.innerHTML = '';
-
-      buildings.forEach(function(building, index) {
-        const buildingElement = document.createElement('div');
-        buildingElement.classList.add('building');
-
-        const buildingInfo = document.createElement('div');
-        buildingInfo.classList.add('buildingInfo');
-        buildingInfo.innerHTML = `
-          <span>Owned: ${building.count}</span>
-          <span>Cost: ${building.cost.toFixed(0)}</span>
-          <span>Production: ${building.production.toFixed(1)} per second</span>
-        `;
-
-        const buildingButton = document.createElement('button');
-        buildingButton.textContent = building.name;
-        buildingButton.disabled = beastPoints < building.cost;
-        buildingButton.addEventListener('click', function() {
-          handleBuildingClick(index);
-        });
-
-        buildingElement.appendChild(buildingInfo);
-        buildingElement.appendChild(buildingButton);
+    function createAllBuildingElements() {
+      const buildingsContainer = document.getElementById("buildingsContainer");
+      for (let i = 0; i < buildings.length; i++) {
+        const buildingElement = createBuildingElement(i);
         buildingsContainer.appendChild(buildingElement);
-      });
+      }
     }
 
-    // Function to update the upgrade clicking accessories button information
-    function updateUpgradeClickingAccessories() {
-      const upgradeClickingAccessoriesButton = document.getElementById('upgradeClickingAccessories');
-      upgradeClickingAccessoriesButton.textContent = `Upgrade Clicking Accessories (${upgradeClickingAccessoriesCost.toFixed(0)} Beast Points)`;
-      upgradeClickingAccessoriesButton.disabled = beastPoints < upgradeClickingAccessoriesCost;
-    }
-
-    // Function to calculate the total beast points per second
-    function calculateBeastPointsPerSecond() {
-      beastPointsPerSecond = 0;
-      buildings.forEach(function(building) {
-        beastPointsPerSecond += building.production * building.count;
-      });
-    }
-
-    // Function to start the game loop
-    function startGameLoop() {
-      intervalId = setInterval(function() {
-        beastPoints += beastPointsPerSecond;
+    function upgradeClickingAccessories() {
+      if (beastPoints >= 100) {
+        beastPoints -= 100;
+        clickPower++;
         updateBeastPoints();
-      }, 1000);
+        updateClickButton();
+      }
     }
 
-    // Function to save the game state
     function saveGameState() {
       const gameState = {
-        beastPoints: beastPoints,
-        clickPower: clickPower,
-        buildings: buildings,
-        upgradeClickingAccessoriesCost: upgradeClickingAccessoriesCost
+        beastPoints,
+        clickPower,
+        beastPointsPerSecond,
+        buildings
       };
-      localStorage.setItem('beastClickerSave', JSON.stringify(gameState));
+      localStorage.setItem("gameState", JSON.stringify(gameState));
     }
 
-    // Function to load the game state
     function loadGameState() {
-      const savedGameState = localStorage.getItem('beastClickerSave');
+      const savedGameState = localStorage.getItem("gameState");
       if (savedGameState) {
         const gameState = JSON.parse(savedGameState);
         beastPoints = gameState.beastPoints;
         clickPower = gameState.clickPower;
+        beastPointsPerSecond = gameState.beastPointsPerSecond;
         buildings = gameState.buildings;
-        upgradeClickingAccessoriesCost = gameState.upgradeClickingAccessoriesCost;
+        updateAllBuildings();
         updateBeastPoints();
-        updateBuildings();
-        updateUpgradeClickingAccessories();
+        updateBeastPointsPerSecond();
+        updateClickButton();
       }
     }
 
-    // Event listeners
-    const clickButton = document.getElementById('clickButton');
-    clickButton.addEventListener('click', handleClick);
+    function initializeGame() {
+      updateBeastPoints();
+      updateBeastPointsPerSecond();
+      updateClickButton();
+      createAllBuildingElements();
+      loadGameState();
+      intervalId = setInterval(incrementBeastPointsPerSecond, 100);
+    }
 
-    const upgradeClickingAccessoriesButton = document.getElementById('upgradeClickingAccessories');
-    upgradeClickingAccessoriesButton.addEventListener('click', handleUpgradeClickingAccessoriesClick);
+    // Event listeners
+    document.getElementById("clickButton").addEventListener("click", incrementBeastPoints);
+    document.getElementById("upgradeClickingAccessories").addEventListener("click", upgradeClickingAccessories);
+
+    // Save game state before the window is closed or reloaded
+    window.addEventListener("beforeunload", saveGameState);
 
     // Initialize the game
-    updateBeastPoints();
-    updateBuildings();
-    updateUpgradeClickingAccessories();
-    calculateBeastPointsPerSecond();
-    startGameLoop();
-
-    // Autosave the game state every 10 seconds
-    setInterval(saveGameState, 10000);
-
-    // Load the game state
-    loadGameState();
+    initializeGame();
   </script>
 </body>
 </html>
