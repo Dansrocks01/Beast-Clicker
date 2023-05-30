@@ -144,11 +144,11 @@
         buildingElement.appendChild(buildingNameElement);
 
         const buildingCountElement = document.createElement('p');
-        buildingCountElement.textContent = `Owned: <span class="count">${building.count}</span>`;
+        buildingCountElement.innerHTML = `Owned: <span class="count">${building.count}</span>`;
         buildingElement.appendChild(buildingCountElement);
 
         const buildingCostElement = document.createElement('p');
-        buildingCostElement.textContent = `Cost: <span class="cost">${building.cost.toFixed(0)}</span> Beast Points`;
+        buildingCostElement.innerHTML = `Cost: <span class="cost">${building.cost.toFixed(0)}</span> Beast Points`;
         buildingElement.appendChild(buildingCostElement);
 
         const buyButton = document.createElement('button');
