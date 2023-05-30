@@ -173,6 +173,16 @@
         upgradesContainer.appendChild(upgradeButton);
       });
     }
+    
+    // Remove the idlePoints variable declaration
+    let points = 0;
+
+    // Function to update the points based on the total effect of all idle click production upgrades
+    function updatePoints() {
+      // Update the points display
+      const pointsDisplay = document.getElementById('points');
+      pointsDisplay.textContent = points.toFixed(0);
+    }
 
     // Function to update the idle points based on the total effect of all idle click production upgrades
     function updateIdlePoints() {
@@ -180,7 +190,7 @@
       idleClickProductionUpgrades.forEach(function(upgrade) {
         totalEffect += upgrade.totalEffect();
       });
-      idlePoints += totalEffect;
+      Points += totalEffect;
       updatePoints();
     }
 
