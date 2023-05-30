@@ -2,241 +2,270 @@
 <html>
 <head>
   <title>Beast Clicker</title>
-  <link rel="stylesheet" type="text/css" href="styles.css">
   <style>
     body {
-      text-align: center;
-      background-image: url("park_background.jpg");
-      background-size: cover;
-      background-repeat: no-repeat;
+      background-color: #b1e1b6;
+      font-family: Arial, sans-serif;
     }
-    #clickButton {
-      display: inline-block;
-      border: none;
-      padding: 0;
-      margin: 0;
-      background: none;
-      cursor: pointer;
+
+    #gameContainer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 50px;
     }
-    #clickButton img {
-      width: 200px;
-      height: auto;
-      transition: transform 0.3s ease;
+
+    #beastPointsContainer {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
-    #clickButton img:hover {
-      transform: scale(1.2);
-    }
-    @keyframes clickAnimation {
-      0% {
-        transform: scale(1);
-      }
-      50% {
-        transform: scale(0.8);
-      }
-      100% {
-        transform: scale(1);
-      }
-    }
-    .clicked {
-      animation: clickAnimation 0.5s;
-    }
-    .building {
-      margin: 20px;
-      padding: 10px;
-      background-color: rgba(255, 255, 255, 0.7);
-      border-radius: 10px;
-      display: inline-block;
-      text-align: left;
-    }
-    .buildingInfo {
+
+    #beastPoints {
+      font-size: 36px;
       margin-bottom: 10px;
     }
-    .buildingInfo span {
-      display: block;
+
+    #perSecondLabel {
+      font-size: 18px;
+    }
+
+    #clickButton {
+      width: 200px;
+      height: 200px;
+      background-image: url(https://dl.openseauserdata.com/cache/originImage/files/704454b4ed7ceda66b45445ceac66383.png);
+      background-size: contain;
+      background-repeat: no-repeat;
+      cursor: pointer;
+    }
+
+    .buildingContainer {
+      background-color: #fff;
+      border-radius: 5px;
+      padding: 10px;
+      margin-top: 20px;
+    }
+
+    .buildingName {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .buildingOwned {
+      font-weight: bold;
+    }
+
+    .buildingCost {
+      color: #888;
+    }
+
+    .buildingButton {
+      margin-top: 10px;
+      padding: 5px 10px;
+      background-color: #4CAF50;
+      color: #fff;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+
+    #upgradeClickingAccessories {
+      margin-top: 20px;
+      padding: 5px 10px;
+      background-color: #4CAF50;
+      color: #fff;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
-  <h1>Beast Clicker</h1>
-  <p>Click the image to earn Beast Points:</p>
-  <button id="clickButton">
-    <img src="https://dl.openseauserdata.com/cache/originImage/files/704454b4ed7ceda66b45445ceac66383.png" alt="Click Me" style="width: 200px; height: auto;" />
-  </button>
-  <div id="beastPointsContainer">
-    <span>Beast Points: </span>
-    <span id="beastPoints">0</span>
+  <div id="gameContainer">
+    <div id="beastPointsContainer">
+      <span id="beastPoints">0</span>
+      <span id="perSecondLabel">Per Second:</span>
+    </div>
+    <div id="clickButton"></div>
+    <div id="buildingsContainer"></div>
   </div>
-  <div id="beastPointsPerSecondContainer">
-    <span>Beast Points per Second: </span>
-    <span id="beastPointsPerSecond">0</span>
+  <div class="buildingContainer">
+    <div class="buildingName">Upgrade Clicking Accessories</div>
+    <div>
+      <span id="upgradeCost">100</span>
+      <span>Beast Points</span>
+    </div>
+    <button id="upgradeClickingAccessories">Upgrade</button>
   </div>
-  <div id="buildingsContainer"></div>
-  <button id="upgradeClickingAccessories">Upgrade Clicking Accessories</button>
 
   <script>
     let beastPoints = 0;
-    let clickPower = 1;
     let beastPointsPerSecond = 0;
-    let intervalId;
+    let clickPower = 1;
     let buildings = [
-      { name: "Beat Street", cost: 10, production: 0.1, count: 0 },
-      { name: "Bullhattan District", cost: 50, production: 0.5, count: 0 },
-      { name: "Champions Court", cost: 100, production: 1, count: 0 },
-      { name: "Cloudy Gardens", cost: 500, production: 5, count: 0 },
-      { name: "Faded Heights", cost: 1000, production: 10, count: 0 },
-      { name: "Fort Flex", cost: 5000, production: 50, count: 0 },
-      { name: "MoBA (Museum of Beast Arts)", cost: 10000, production: 100, count: 0 },
-      { name: "Nowhere Parks", cost: 50000, production: 500, count: 0 },
-      { name: "Silicon Alley", cost: 100000, production: 1000, count: 0 },
-      { name: "Studio 66", cost: 500000, production: 5000, count: 0 },
-      { name: "The Meadows", cost: 1000000, production: 10000, count: 0 },
-      { name: "Trusty Lake Estates", cost: 5000000, production: 50000, count: 0 },
-      { name: "Wagmi Way", cost: 10000000, production: 100000, count: 0 },
-      { name: "Concrete Jungle", cost: 50000000, production: 500000, count: 0 },
-      { name: "L33T Labs", cost: 100000000, production: 1000000, count: 0 },
-      { name: "Ramone Alley", cost: 500000000, production: 5000000, count: 0 },
-      { name: "The Odeon", cost: 1000000000, production: 10000000, count: 0 },
-      { name: "Cortado Cafe", cost: 5000000000, production: 50000000, count: 0 },
-      { name: "Gaia Grove", cost: 10000000000, production: 100000000, count: 0 },
-      { name: "The Beastro", cost: 50000000000, production: 500000000, count: 0 }
+      { name: "Beat Street", cost: 15, production: 0.1, count: 0 },
+      { name: "Bullhattan District", cost: 100, production: 1, count: 0 },
+      { name: "Champions Court", cost: 1100, production: 8, count: 0 },
+      { name: "Cloudy Gardens", cost: 12000, production: 47, count: 0 },
+      { name: "Faded Heights", cost: 130000, production: 260, count: 0 },
+      { name: "Fort Flex", cost: 1400000, production: 1400, count: 0 },
+      { name: "MoBA (Museum of Beast Arts)", cost: 20000000, production: 7800, count: 0 },
+      { name: "Nowhere Parks", cost: 330000000, production: 44000, count: 0 },
+      { name: "Silicon Alley", cost: 5100000000, production: 260000, count: 0 },
+      { name: "Studio 66", cost: 75000000000, production: 1600000, count: 0 },
+      { name: "The Meadows", cost: 1000000000000, production: 10000000, count: 0 },
+      { name: "Trusty Lake Estates", cost: 14000000000000, production: 65000000, count: 0 },
+      { name: "Wagmi Way", cost: 170000000000000, production: 430000000, count: 0 },
+      { name: "Concrete Jungle", cost: 2100000000000000, production: 2900000000, count: 0 },
+      { name: "L33T Labs", cost: 26000000000000000, production: 21000000000, count: 0 },
+      { name: "Ramone Alley", cost: 310000000000000000, production: 150000000000, count: 0 },
+      { name: "The Odeon", cost: 4700000000000000000, production: 1100000000000, count: 0 },
+      { name: "Cortado Cafe", cost: 67000000000000000000, production: 8200000000000, count: 0 },
+      { name: "Gaia Grove", cost: 930000000000000000000, production: 63000000000000, count: 0 },
+      { name: "The Beastro", cost: 14000000000000000000000, production: 490000000000000, count: 0 }
     ];
 
+    let intervalId;
+
     function updateBeastPoints() {
-      document.getElementById("beastPoints").textContent = beastPoints;
+      document.getElementById("beastPoints").textContent = beastPoints.toFixed(0);
     }
 
     function updateBeastPointsPerSecond() {
-      document.getElementById("beastPointsPerSecond").textContent = beastPointsPerSecond.toFixed(1);
-    }
-
-    function updateBuildingCount(index) {
-      document.getElementById(`buildingCount-${index}`).textContent = buildings[index].count;
-    }
-
-    function updateBuildingCost(index) {
-      document.getElementById(`buildingCost-${index}`).textContent = buildings[index].cost;
-    }
-
-    function updateBuildingProduction(index) {
-      document.getElementById(`buildingProduction-${index}`).textContent = buildings[index].production;
-    }
-
-    function updateAllBuildings() {
-      for (let i = 0; i < buildings.length; i++) {
-        updateBuildingCount(i);
-        updateBuildingCost(i);
-        updateBuildingProduction(i);
-      }
+      document.getElementById("perSecondLabel").textContent = `Per Second: ${beastPointsPerSecond.toFixed(1)}`;
     }
 
     function updateClickButton() {
-      document.getElementById("clickButton").textContent = `Click Me! (${clickPower})`;
+      document.getElementById("clickButton").textContent = `Click (+${clickPower})`;
     }
 
-    function incrementBeastPoints() {
-      beastPoints += clickPower;
-      updateBeastPoints();
+    function updateBuilding(building) {
+      const buildingElement = document.getElementById(building.name);
+      buildingElement.querySelector(".buildingOwned").textContent = building.count;
+      buildingElement.querySelector(".buildingCost").textContent = `${building.cost.toFixed(0)} Beast Points`;
     }
 
-    function incrementBeastPointsPerSecond() {
-      beastPoints += beastPointsPerSecond / 10;
-      updateBeastPoints();
+    function updateAllBuildings() {
+      buildings.forEach(updateBuilding);
     }
 
-    function purchaseBuilding(index) {
-      if (beastPoints >= buildings[index].cost) {
-        beastPoints -= buildings[index].cost;
-        buildings[index].count++;
-        beastPointsPerSecond += buildings[index].production;
+    function createBuildingElement(building) {
+      const buildingContainer = document.createElement("div");
+      buildingContainer.classList.add("buildingContainer");
+      buildingContainer.id = building.name;
+
+      const buildingName = document.createElement("div");
+      buildingName.classList.add("buildingName");
+      buildingName.textContent = building.name;
+
+      const buildingOwned = document.createElement("div");
+      buildingOwned.classList.add("buildingOwned");
+      buildingOwned.textContent = building.count;
+
+      const buildingCost = document.createElement("div");
+      buildingCost.classList.add("buildingCost");
+      buildingCost.textContent = `${building.cost.toFixed(0)} Beast Points`;
+
+      const buildingButton = document.createElement("button");
+      buildingButton.classList.add("buildingButton");
+      buildingButton.textContent = "Buy";
+      buildingButton.addEventListener("click", () => buyBuilding(building));
+
+      buildingContainer.appendChild(buildingName);
+      buildingContainer.appendChild(buildingOwned);
+      buildingContainer.appendChild(buildingCost);
+      buildingContainer.appendChild(buildingButton);
+
+      return buildingContainer;
+    }
+
+    function updateUpgradeClickingAccessories() {
+      const upgradeCostElement = document.getElementById("upgradeCost");
+      upgradeCostElement.textContent = upgradeClickingAccessoriesCost().toFixed(0);
+    }
+
+    function upgradeClickingAccessoriesCost() {
+      return Math.pow(1.2, clickPower) * 100;
+    }
+
+    function buyBuilding(building) {
+      if (beastPoints >= building.cost) {
+        beastPoints -= building.cost;
+        building.count++;
+        beastPointsPerSecond += building.production;
+        building.cost *= 1.15;
         updateBeastPoints();
         updateBeastPointsPerSecond();
-        updateBuildingCount(index);
-      }
-    }
-
-    function createBuildingElement(index) {
-      const building = buildings[index];
-      const buildingElement = document.createElement("div");
-      buildingElement.className = "building";
-      buildingElement.innerHTML = `
-        <span class="buildingName">${building.name}</span>
-        <div>
-          <span class="buildingOwned" id="buildingCount-${index}">${building.count}</span>
-          <span class="buildingLabel">Owned</span>
-        </div>
-        <div>
-          <span class="buildingCost" id="buildingCost-${index}">${building.cost}</span>
-          <span class="buildingLabel">Cost</span>
-        </div>
-        <div>
-          <span class="buildingProduction" id="buildingProduction-${index}">${building.production}</span>
-          <span class="buildingLabel">Production</span>
-        </div>
-        <button class="buildingButton" onclick="purchaseBuilding(${index})">Buy</button>
-      `;
-      return buildingElement;
-    }
-
-    function createAllBuildingElements() {
-      const buildingsContainer = document.getElementById("buildingsContainer");
-      for (let i = 0; i < buildings.length; i++) {
-        const buildingElement = createBuildingElement(i);
-        buildingsContainer.appendChild(buildingElement);
+        updateBuilding(building);
       }
     }
 
     function upgradeClickingAccessories() {
-      if (beastPoints >= 100) {
-        beastPoints -= 100;
+      const upgradeCost = upgradeClickingAccessoriesCost();
+      if (beastPoints >= upgradeCost) {
+        beastPoints -= upgradeCost;
         clickPower++;
-        updateBeastPoints();
         updateClickButton();
+        updateUpgradeClickingAccessories();
       }
     }
 
-    function saveGameState() {
-      const gameState = {
+    function saveGame() {
+      const saveData = {
         beastPoints,
-        clickPower,
         beastPointsPerSecond,
+        clickPower,
         buildings
       };
-      localStorage.setItem("gameState", JSON.stringify(gameState));
+      localStorage.setItem("beastClickerSave", JSON.stringify(saveData));
     }
 
-    function loadGameState() {
-      const savedGameState = localStorage.getItem("gameState");
-      if (savedGameState) {
-        const gameState = JSON.parse(savedGameState);
-        beastPoints = gameState.beastPoints;
-        clickPower = gameState.clickPower;
-        beastPointsPerSecond = gameState.beastPointsPerSecond;
-        buildings = gameState.buildings;
+    function loadGame() {
+      const saveData = localStorage.getItem("beastClickerSave");
+      if (saveData) {
+        const data = JSON.parse(saveData);
+        beastPoints = data.beastPoints;
+        beastPointsPerSecond = data.beastPointsPerSecond;
+        clickPower = data.clickPower;
+        buildings = data.buildings;
         updateAllBuildings();
         updateBeastPoints();
         updateBeastPointsPerSecond();
         updateClickButton();
+        updateUpgradeClickingAccessories();
       }
     }
 
-    function initializeGame() {
-      updateBeastPoints();
-      updateBeastPointsPerSecond();
-      updateClickButton();
-      createAllBuildingElements();
-      loadGameState();
-      intervalId = setInterval(incrementBeastPointsPerSecond, 100);
+    function autosaveGame() {
+      saveGame();
     }
 
-    // Event listeners
-    document.getElementById("clickButton").addEventListener("click", incrementBeastPoints);
-    document.getElementById("upgradeClickingAccessories").addEventListener("click", upgradeClickingAccessories);
+    document.getElementById("clickButton").addEventListener("click", () => {
+      beastPoints += clickPower;
+      updateBeastPoints();
+    });
 
-    // Save game state before the window is closed or reloaded
-    window.addEventListener("beforeunload", saveGameState);
+    document.getElementById("upgradeClickingAccessories").addEventListener("click", () => {
+      upgradeClickingAccessories();
+    });
 
-    // Initialize the game
-    initializeGame();
+    buildings.forEach((building) => {
+      document.getElementById("buildingsContainer").appendChild(createBuildingElement(building));
+    });
+
+    updateClickButton();
+    updateAllBuildings();
+    updateBeastPoints();
+    updateBeastPointsPerSecond();
+    updateUpgradeClickingAccessories();
+    loadGame();
+    intervalId = setInterval(() => {
+      beastPoints += beastPointsPerSecond;
+      updateBeastPoints();
+    }, 1000);
+
+    setInterval(autosaveGame, 5000);
   </script>
 </body>
 </html>
